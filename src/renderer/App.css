@@ -7,3 +7,9 @@ body {
   height: 100vh;
   display: flex;
 }
+
+#content {
+  width: 100vw;
+  height: 100vw;
+  background-color: lightgray;
+}

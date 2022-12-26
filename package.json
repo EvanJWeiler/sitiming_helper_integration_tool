@@ -120,7 +120,7 @@
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.3.0",
     "stream": "^0.0.2",
-    "tedious": "^15.1.0"
+    "tedious": "^15.1.2"
   },
   "devDependencies": {
     "@pmmmwh/react-refresh-webpack-plugin": "^0.5.7",

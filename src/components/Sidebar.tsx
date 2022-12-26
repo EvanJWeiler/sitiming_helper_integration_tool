@@ -5,7 +5,7 @@ import DirectionsBikeIcon from '@mui/icons-material/DirectionsBike';
 import ImportExportIcon from '@mui/icons-material/ImportExport';
 import SettingsIcon from '@mui/icons-material/Settings';
 import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
+import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
 import { NavLink } from 'react-router-dom';
 
@@ -43,38 +43,14 @@ function Sidebar(): JSX.Element {
       <List disablePadding>
         {SidebarData.map(({ key, label, path, icon }) => (
           <NavLink to={path} key={key} className="sidebarItem">
-            <ListItem button>
+            <ListItemButton>
               <div className="sidebarIcon">{icon}</div>
               <ListItemText>{label}</ListItemText>
-            </ListItem>
+            </ListItemButton>
           </NavLink>
         ))}
       </List>
     </div>
-
-    // <div className="Sidebar">
-    //   <ul className="SidebarList">
-    //     {SidebarData.map((item) => {
-    //       return (
-    //         <li
-    //           role="presentation"
-    //           className={
-    //             window.location.pathname === item.link
-    //               ? 'SidebarItem active'
-    //               : 'SidebarItem'
-    //           }
-    //           key={item.id}
-    //           onMouseDown={() => {
-    //             window.location.pathname = item.link;
-    //           }}
-    //         >
-    //           <div className="icon">{item.icon}</div>
-    //           <div className="title">{item.title}</div>
-    //         </li>
-    //       );
-    //     })}
-    //   </ul>
-    // </div>
   );
 }
 

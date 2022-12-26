@@ -1,14 +1,26 @@
 const { Connection, Request: Req } = require('tedious');
 
 interface Racer {
-  Name: string;
-  'Team Name': string;
-  'Bib Number': number;
-  Class: string;
+  id: string;
+  name: string;
+  teamName: string;
+  bibNumber: number;
+  class: string;
+}
+
+interface Category {
+  id: string;
+  name: string;
+  courseId: string;
+}
+
+interface Race {
+  id: string;
+  name: string;
 }
 
 const config = {
-  server: 'localhost',
+  server: '216.243.35.187',
 
   authentication: {
     type: 'default',
@@ -77,7 +89,7 @@ const getRacersByCategory = (category: string): Promise<Racer[]> => {
     connectToServer()
       .then((connection) => {
         const query = `
-          select e.Name as 'Name', e.Club as 'Team Name', e.RaceNumber as 'Bib Number', c.Name as 'Class' from Entry e
+          select e.ID as 'id', e.Name as 'name', e.Club as 'teamName', e.RaceNumber as 'bibNumber', c.Name as 'class' from Entry e
           join EntryEvent ee on ee.EntryID = e.ID
           join Class c on c.ID = ee.ClassID
           where c.Name = '${category}'
@@ -93,8 +105,47 @@ const getRacersByCategory = (category: string): Promise<Racer[]> => {
   });
 };
 
+const getAllCategories = (raceId: string): Promise<Category[]> => {
+  return new Promise((resolve, reject) => {
+    connectToServer()
+      .then((connection) => {
+        const query = `
+          select c.ID as 'id', c.Name as 'name', c.CourseID as 'courseId' from Class c
+          where c.EventID = '${raceId}'
+          order by c.Name asc
+        `;
+
+        return executeQuery(connection, query);
+      })
+      .then((categories) => {
+        resolve(categories);
+      })
+      .catch((err) => reject(err));
+  });
+}
+
+const getAllRaces = (): Promise<Race[]> => {
+  return new Promise((resolve, reject) => {
+    connectToServer()
+      .then((connection) => {
+        const query = `
+          select e.ID as 'id', e.Name as 'name' from Event e
+          order by e.Date desc
+        `;
+
+        return executeQuery(connection, query);
+      })
+      .then((races) => {
+        resolve(races);
+      })
+      .catch((err) => reject(err));
+  });
+}
+
 const SqlAPI = {
   getRacersByCategory,
+  getAllCategories,
+  getAllRaces
 };
 
 export default SqlAPI;
