@@ -79,7 +79,7 @@ const RaceStatus = () => {
   }
 
   return (
-    <div className="list">
+    <div>
       <FormControl fullWidth
         variant='filled'
       >
