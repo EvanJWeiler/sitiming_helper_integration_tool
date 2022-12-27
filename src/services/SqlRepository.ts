@@ -1,46 +1,33 @@
 const { Connection, Request: Req } = require('tedious');
 
-interface Racer {
-  id: string;
-  name: string;
-  teamName: string;
-  bibNumber: number;
-  class: string;
-}
+import { Race, Racer, Category } from "interfaces/Database";
+import SettingsAPI from "./SettingsRepository";
 
-interface Category {
-  id: string;
-  name: string;
-  courseId: string;
-}
+const getConfig = () => {
+  const serverSettings = SettingsAPI.getSettings();
 
-interface Race {
-  id: string;
-  name: string;
-}
-
-const config = {
-  server: '216.243.35.187',
-
-  authentication: {
-    type: 'default',
-    options: {
-      userName: 'sa',
-      password: 'ABCDEFGH',
+  return {
+    server: serverSettings.address,
+    authentication: {
+      type: 'default',
+      options: {
+        userName: serverSettings.username,
+        password: serverSettings.password
+      }
     },
-  },
-
-  options: {
-    database: 'events4',
-    encrypt: false,
-    trustServerCertificate: false,
-    rowCollectionOnDone: true,
-  },
-};
+    options: {
+      database: serverSettings.database,
+      port: serverSettings.port,
+      encrypt: false,
+      trustServerCertificate: false,
+      rowCollectionOnDone: true
+    }
+  }
+}
 
 const connectToServer = (): Promise<typeof Connection> => {
   return new Promise((resolve, reject) => {
-    const connection = new Connection(config);
+    const connection = new Connection(getConfig());
     connection.connect();
 
     connection.on('connect', (err: Error) => {

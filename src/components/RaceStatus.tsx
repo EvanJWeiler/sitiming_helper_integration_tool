@@ -7,8 +7,6 @@ import {
   Accordion, 
   AccordionDetails, 
   AccordionSummary, 
-  Button, 
-  CircularProgress, 
   Divider, 
   FormControl, 
   InputLabel, 
@@ -16,38 +14,12 @@ import {
   MenuItem, 
   Select, 
   SelectChangeEvent, 
-  Typography 
+  Typography,
+  Box 
 } from '@mui/material';
-import {
-  LoadingButton
-} from '@mui/lab'
-import IconButton from '@mui/material/IconButton';
-import { Box } from '@mui/system';
-
-// function testSqlGetRacers() {
-//   window.api.sqlAPI.getRacersByCategory('TEAM ENDURO | FIRE MEN')
-//     .then((res) => {
-//       console.log(res);
-//     })
-// }
-
-interface Category {
-  id: string;
-  name: string;
-  courseId: string;
-}
-
-interface Race {
-  id: string;
-  name: string;
-}
-
-interface RaceStatusState {
-  categoryList: Category[];
-  raceList: Race[];
-  selectedRace: string;
-  isRefreshing: boolean;
-}
+import { LoadingButton } from '@mui/lab'
+// import { Box } from '@mui/system';
+import { RaceStatusState } from 'interfaces/State';
 
 const RaceStatus = () => {
   const [raceStatusState, setRaceStatus] = useState<RaceStatusState>({
@@ -59,19 +31,14 @@ const RaceStatus = () => {
 
   // on component mount
   useEffect(() => {
-    let stateString = window.localStorage.getItem('raceStatus');
-    let newState = stateString != null ? JSON.parse(stateString) : {
-      categoryList: [],
-      raceList: [],
-      selectedRace: '',
-      isRefreshing: false
-    }
+    let stateString = window.localStorage.getItem('raceStatus') as string;
+    let state = JSON.parse(stateString);
 
-    if (newState.raceList.length === 0) {
+    if (state.raceList.length === 0) {
       getRaces();
     }
 
-    setRaceStatus(newState);
+    setRaceStatus(state);
   }, []);
 
   // whenever race state is updated
@@ -137,7 +104,6 @@ const RaceStatus = () => {
           startIcon={<Refresh />}
           loading={raceStatusState.isRefreshing}
           style={{
-            backgroundColor: 'gray',
             marginLeft: '10px'
           }}
         >

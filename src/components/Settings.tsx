@@ -1,9 +1,31 @@
-import React from 'react';
-import { Button, Card, FormControl, InputLabel, Paper, TextField, Typography } from '@mui/material';
+import React, { useState, useEffect } from 'react';
+import {
+  Paper, 
+  TextField, 
+  Typography 
+} from '@mui/material';
+import {
+  LoadingButton
+} from '@mui/lab'
+import { Save } from '@mui/icons-material';
+import { SettingsState } from 'interfaces/State';
 
 const Settings = () => {
-  function handleSubmit() {
+  const [settingsState, setSettingsState] = useState<SettingsState>({
+    settings: window.api.settingsAPI.getSettings(),
+    isSubmitting: false
+  });
 
+  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    setSettingsState({...settingsState, isSubmitting: true});
+
+    // TODO: validation logic here
+
+    window.api.settingsAPI.saveSettings(settingsState.settings);
+    
+    setSettingsState({...settingsState, isSubmitting: false});
   }
 
   return (
@@ -27,33 +49,76 @@ const Settings = () => {
           SiTiming Server Settings
         </Typography>
         <TextField 
-          label='SiTiming Server IP Address'
+          name='address'
+          label='Server IP Address'
           margin='dense'
+          value={settingsState.settings.address}
+          onChange={(e) => { 
+            setSettingsState({
+              ...settingsState,
+              settings: { ...settingsState.settings, address: e.target.value }
+            }) 
+          }}
         />
         <TextField 
-          label='SiTiming Server Port'
-          margin='dense' 
+          name='port'
+          label='Server Port'
+          margin='dense'
+          value={settingsState.settings.port}
+          onChange={(e) => { 
+            setSettingsState({
+              ...settingsState,
+              settings: { ...settingsState.settings, port: parseInt(e.target.value) }
+            }) 
+          }}
         />
         <TextField 
+          name='database'
           label='Database'
-          margin='dense' 
+          margin='dense'
+          value={settingsState.settings.database}
+          onChange={(e) => { 
+            setSettingsState({
+              ...settingsState,
+              settings: { ...settingsState.settings, database: e.target.value }
+            }) 
+          }}
         />
         <TextField 
+          name='username'
           label='Username'
-          margin='dense' 
+          margin='dense'
+          value={settingsState.settings.username}
+          onChange={(e) => { 
+            setSettingsState({
+              ...settingsState,
+              settings: { ...settingsState.settings, username: e.target.value }
+            }) 
+          }}
         />
-        <TextField 
+        <TextField
+          name='password'
           label='Password'
           margin='dense'
+          value={settingsState.settings.password}
+          onChange={(e) => { 
+            setSettingsState({
+              ...settingsState,
+              settings: { ...settingsState.settings, password: e.target.value }
+            }) 
+          }}
         />
-        <Button 
+        <LoadingButton 
+          type='submit'
           variant='contained'
+          startIcon={<Save />}
+          loading={settingsState.isSubmitting}
           style={{
             marginTop: '10px'
           }}
         >
           Save
-        </Button>
+        </LoadingButton>
       </Paper>
     </form>
   )
