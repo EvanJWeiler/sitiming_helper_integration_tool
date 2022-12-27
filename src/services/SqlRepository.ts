@@ -72,7 +72,9 @@ const executeQuery = (connection: typeof Connection, sqlQuery: string) => {
         results = [];
         rows.forEach((row) => {
           const result = {};
+          // @ts-ignore
           row.map(child => {
+            // @ts-ignore
             result[child.metadata.colName] = child.value;
           });
           results.push(result);
@@ -98,7 +100,7 @@ const getRacersByCategory = (category: string): Promise<Racer[]> => {
 
         return executeQuery(connection, query);
       })
-      .then((racers) => {
+      .then((racers: any) => {
         resolve(racers);
       })
       .catch((err) => reject(err));
@@ -117,7 +119,7 @@ const getAllCategories = (raceId: string): Promise<Category[]> => {
 
         return executeQuery(connection, query);
       })
-      .then((categories) => {
+      .then((categories: any) => {
         resolve(categories);
       })
       .catch((err) => reject(err));
@@ -135,7 +137,7 @@ const getAllRaces = (): Promise<Race[]> => {
 
         return executeQuery(connection, query);
       })
-      .then((races) => {
+      .then((races: any) => {
         resolve(races);
       })
       .catch((err) => reject(err));
