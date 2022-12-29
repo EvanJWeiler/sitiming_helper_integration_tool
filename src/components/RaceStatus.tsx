@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {
-  ExpandMoreSharp, 
+  ExpandMoreSharp,
   Refresh
 } from '@mui/icons-material'
 import { 
@@ -18,27 +18,53 @@ import {
   Box 
 } from '@mui/material';
 import { LoadingButton } from '@mui/lab'
-// import { Box } from '@mui/system';
-import { RaceStatusState } from 'interfaces/State';
+import { RaceStatusState, ListState } from 'interfaces/State';
+import { Racer } from 'interfaces/Database';
 
 const RaceStatus = () => {
   const [raceStatusState, setRaceStatus] = useState<RaceStatusState>({
     categoryList: [],
-    raceList: [],
-    selectedRace: '',
-    isRefreshing: false
+    racerList: []
   });
+
+  const [listState, setListState] = useState<ListState>({
+    raceList: [],
+    selectedRace: ''
+  });
+
+  const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
+
+  // TODO: rename raceStatusState and listState to better names
 
   // on component mount
   useEffect(() => {
-    let stateString = window.localStorage.getItem('raceStatus') as string;
-    let state = JSON.parse(stateString);
+    let raceStateString = window.localStorage.getItem('raceStatus') as string;
+    let listStateString = window.localStorage.getItem('listState') as string;
+ 
+    if (!raceStateString) {
+      raceStateString = JSON.stringify({
+        categoryList: [],
+        racerMap: new Map<string, Racer[]>()
+      });
+    }
 
-    if (state.raceList.length === 0) {
+    if (!listStateString) {
+      listStateString = JSON.stringify({
+        raceList: [],
+        selectedRace: ''
+      });
+    }
+
+    let raceState = JSON.parse(raceStateString);
+    let listState = JSON.parse(listStateString);
+
+    if (listState.raceList.length === 0) {
       getRaces();
     }
 
-    setRaceStatus(state);
+    setRaceStatus(raceState);
+    setListState(listState);
+    setIsRefreshing(false);
   }, []);
 
   // whenever race state is updated
@@ -46,30 +72,58 @@ const RaceStatus = () => {
     window.localStorage.setItem('raceStatus', JSON.stringify(raceStatusState));
   }, [raceStatusState]);
 
-  function getRaceCats(raceId: string) {
-    window.api.sqlAPI.getAllCategories(raceId)
-      .then((res) => {
-        setRaceStatus({...raceStatusState, categoryList: res, selectedRace: raceId});
-      })
-  }
+  useEffect(() => {
+    window.localStorage.setItem('listState', JSON.stringify(listState));
+  }, [listState]);
 
   function getRaces() {
     window.api.sqlAPI.getAllRaces()
       .then((res) => {
-        setRaceStatus({...raceStatusState, raceList: res});
+        setListState({...listState, raceList: res});
+        setIsRefreshing(false);
+      })
+      .catch((err) => {
+        throw err;
+      });
+  }
+
+  function generateCatList(raceId: string) {
+    const promises = [
+      window.api.sqlAPI.getAllCategories(raceId),
+      window.api.sqlAPI.getRacersByRaceId(raceId)
+    ];
+
+    Promise.all(promises)
+      .then((data) => {
+        let newState = {
+          categoryList: data[0],
+          racerList: data[1] as Racer[]
+        }
+
+        setRaceStatus(newState);
+      })
+      .catch((err) => {
+        console.error(err);
       })
   }
 
   function handleRaceSelect(event: SelectChangeEvent) {
-    getRaceCats(event.target.value);
+    const selectedRace = event.target.value;
+
+    setListState({...listState, selectedRace: selectedRace});
+
+    generateCatList(selectedRace);
   }
 
   function handleRefresh() {
-    setRaceStatus({...raceStatusState, isRefreshing: true});
+    const selectedRace = listState.selectedRace;
 
-    setTimeout(() => {
-      setRaceStatus({...raceStatusState, isRefreshing: false});
-    }, 1000);
+    setIsRefreshing(true);
+    getRaces();
+
+    if (selectedRace != '') {
+      generateCatList(selectedRace);
+    }
   }
 
   return (
@@ -83,7 +137,7 @@ const RaceStatus = () => {
         <FormControl variant="filled" fullWidth>
           <InputLabel id="raceInputLabel">Select Race</InputLabel>
           <Select
-            value={raceStatusState.selectedRace}
+            value={listState.selectedRace}
             onChange={handleRaceSelect}
             labelId="raceInputLabel"
             label="Select Race"
@@ -93,7 +147,7 @@ const RaceStatus = () => {
               backgroundColor: 'white'
             }}
           >
-            {raceStatusState.raceList.map(({ id, name }) => (
+            {listState.raceList.map(({ id, name }) => (
               <MenuItem key={id} value={id}>{name}</MenuItem>
             ))}
           </Select>
@@ -102,7 +156,7 @@ const RaceStatus = () => {
           variant='contained'
           onClick={handleRefresh}
           startIcon={<Refresh />}
-          loading={raceStatusState.isRefreshing}
+          loading={isRefreshing}
           style={{
             marginLeft: '10px'
           }}
@@ -111,7 +165,7 @@ const RaceStatus = () => {
         </LoadingButton>
       </Box>
       <List>
-        {raceStatusState.categoryList.map(({ id, name, courseId }) => (
+        {raceStatusState.categoryList.map(({ id, name }) => (
           <div key={id}>
             <Accordion disableGutters square>
               <AccordionSummary
@@ -120,7 +174,11 @@ const RaceStatus = () => {
                 <Typography>{name}</Typography>
               </AccordionSummary>
               <AccordionDetails>
-                Placeholder text for category '{name}'.
+                {raceStatusState.racerList
+                  .filter(racer => racer.categoryId == id)
+                  .map(({ id, name, checkedIn }) => (
+                    <Typography key={id}>Name: {name}, Checked In? {checkedIn.toString()}</Typography>
+                ))}
               </AccordionDetails>
             </Accordion>
             <Divider light />

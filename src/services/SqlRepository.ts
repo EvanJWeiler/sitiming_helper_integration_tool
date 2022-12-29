@@ -94,12 +94,35 @@ const getRacersByCategory = (category: string): Promise<Racer[]> => {
   });
 };
 
+const getRacersByRaceId = (raceId: string): Promise<Racer[]> => {
+  return new Promise((resolve, reject) => {
+    connectToServer()
+      .then((connection) => {
+        const query = `
+          select
+            e.ID as 'id', e.Name as 'name', e.Club as 'teamName', e.RaceNumber as 'bibNumber',
+            ee.ClassID as 'categoryId', ee.AllReturnedOrLostBroken as 'checkedIn'
+          from EntryEvent ee
+          join Entry e on ee.EntryID = e.ID
+          where ee.EventID='${raceId}'
+          order by teamName asc
+        `;
+
+        return executeQuery(connection, query);
+      })
+      .then((racers: any) => {
+        resolve(racers);
+      })
+      .catch((err) => reject(err));
+  });
+}
+
 const getAllCategories = (raceId: string): Promise<Category[]> => {
   return new Promise((resolve, reject) => {
     connectToServer()
       .then((connection) => {
         const query = `
-          select c.ID as 'id', c.Name as 'name', c.CourseID as 'courseId' from Class c
+          select c.ID as 'id', c.Name as 'name' from Class c
           where c.EventID = '${raceId}'
           order by c.Name asc
         `;
@@ -133,6 +156,7 @@ const getAllRaces = (): Promise<Race[]> => {
 
 const SqlAPI = {
   getRacersByCategory,
+  getRacersByRaceId,
   getAllCategories,
   getAllRaces
 };

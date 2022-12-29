@@ -1,4 +1,4 @@
-import { Race, Category } from "./Database";
+import { Race, Racer, Category } from "./Database";
 import { ServerSettings } from "./Schema";
 
 export interface SettingsState {
@@ -8,7 +8,10 @@ export interface SettingsState {
 
 export interface RaceStatusState {
     categoryList: Category[];
+    racerList: Racer[];
+}
+
+export interface ListState {
     raceList: Race[];
     selectedRace: string;
-    isRefreshing: boolean;
 }

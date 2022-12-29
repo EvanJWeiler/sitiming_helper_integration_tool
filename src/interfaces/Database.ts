@@ -8,11 +8,11 @@ export interface Racer {
     name: string;
     teamName: string;
     bibNumber: number;
-    class: string;
+    categoryId: string;
+    checkedIn: boolean;
 }
 
 export interface Category {
     id: string;
     name: string;
-    courseId: string;
 }
