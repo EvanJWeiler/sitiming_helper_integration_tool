@@ -1,6 +1,6 @@
 export interface ServerSettings {
     address: string,
-    port: number,
+    port: string,
     database: string,
     username: string,
     password: string,

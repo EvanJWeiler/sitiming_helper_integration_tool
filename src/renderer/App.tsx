@@ -1,6 +1,6 @@
 import './App.css';
 
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { HashRouter as Router, Routes, Route } from 'react-router-dom';
 import RaceStatus from 'components/RaceStatus';
 import RaceData from 'components/RaceData';
 import Settings from 'components/Settings';

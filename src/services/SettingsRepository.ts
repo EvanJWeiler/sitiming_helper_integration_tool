@@ -5,7 +5,19 @@ const saveSettings = (settings: ServerSettings) => {
 }
 
 const getSettings = () : ServerSettings => {
-    return JSON.parse(localStorage.getItem('settings') as string) ;
+    const settingsString = localStorage.getItem('settings');
+
+    if (!settingsString) {
+        return {
+            address: '',
+            port: '',
+            database: '',
+            username: '',
+            password: '' 
+        };
+    } else {
+        return JSON.parse(settingsString);
+    }
 } 
 
 const SettingsAPI = {
