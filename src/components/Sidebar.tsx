@@ -1,6 +1,4 @@
 import React from 'react';
-import './Sidebar.css';
-
 import DirectionsBikeIcon from '@mui/icons-material/DirectionsBike';
 import ImportExportIcon from '@mui/icons-material/ImportExport';
 import SettingsIcon from '@mui/icons-material/Settings';
@@ -32,20 +30,64 @@ const SidebarData = [
   },
 ];
 
-function Sidebar(): JSX.Element {
+const linkStyle = {
+  width: '100%',
+  height: '100%',
+  display: 'flex',
+  color: 'whitesmoke',
+  justifyContent: 'center',
+  alignItems: 'center',
+  textDecoration: 'none'
+};
+
+const linkStyleActive = {
+  ...linkStyle,
+  backgroundColor: 'rgb(40,40,40)'
+};
+
+const Sidebar = () : JSX.Element => {
   return (
-    <div className="sidebar">
+    <div
+      style={{
+        height: '100vh',
+        width: '250px',
+        backgroundColor: 'rgb(50,50,50)',
+        color: 'lightgray',
+      }}
+    >
       <img
         src={sportident_logo}
         alt="Sport Ident Logo"
-        className="sidebarLogo"
+        style={{
+          width: '90%',
+          margin: '10px'
+        }}
       />
       <List disablePadding>
         {SidebarData.map(({ key, label, path, icon }) => (
-          <NavLink to={path} key={key} className="sidebarItem">
+          <NavLink
+            key={key}
+            to={path}
+            style={({ isActive }) => 
+              isActive ? linkStyleActive : linkStyle
+            }  
+          >
             <ListItemButton>
-              <div className="sidebarIcon">{icon}</div>
-              <ListItemText>{label}</ListItemText>
+              <div
+                style={{
+                  paddingRight: '10px',
+                  marginBottom: '-7px'
+                }}
+              >
+                {icon}
+              </div>
+              <ListItemText
+                primaryTypographyProps={{
+                  fontSize: '1.2em'
+                }}
+              >
+                {label}
+              </ListItemText>
             </ListItemButton>
           </NavLink>
         ))}

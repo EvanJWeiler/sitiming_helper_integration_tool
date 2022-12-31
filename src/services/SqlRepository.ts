@@ -101,11 +101,13 @@ const getRacersByRaceId = (raceId: string): Promise<Racer[]> => {
         const query = `
           select
             e.ID as 'id', e.Name as 'name', e.Club as 'teamName', e.RaceNumber as 'bibNumber',
-            ee.ClassID as 'categoryId', ee.AllReturnedOrLostBroken as 'checkedIn'
+            ee.ClassID as 'categoryId', ee.AllReturnedOrLostBroken as 'checkedIn',
+            sc.CardNumber as 'cardNumber'
           from EntryEvent ee
           join Entry e on ee.EntryID = e.ID
+          join SiCard sc on ee.ID = sc.EntryEventID
           where ee.EventID='${raceId}'
-          order by teamName asc
+          order by e.RaceNumber asc
         `;
 
         return executeQuery(connection, query);

@@ -1,7 +1,7 @@
-import { Typography } from '@mui/material';
 import React from 'react';
+import { Typography } from '@mui/material';
 
-const RaceData = () => {
+const RaceData = () : JSX.Element => {
   return (
     <Typography variant="h5">To Be Implemented</Typography>
   );

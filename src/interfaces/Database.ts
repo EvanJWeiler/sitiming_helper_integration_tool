@@ -10,6 +10,7 @@ export interface Racer {
     bibNumber: number;
     categoryId: string;
     checkedIn: boolean;
+    cardNumber: number;
 }
 
 export interface Category {

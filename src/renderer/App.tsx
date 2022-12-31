@@ -12,6 +12,11 @@ const theme = createTheme({
     primary: {
       main: '#606060'
     }
+  },
+  typography: {
+    fontFamily: [
+      '"Segoe UI"'
+    ].join(',')
   }
 })
 

@@ -10,7 +10,7 @@ import {
 import { Save } from '@mui/icons-material';
 import { SettingsState } from 'interfaces/State';
 
-const Settings = () => {
+const Settings = () : JSX.Element => {
   const [settingsState, setSettingsState] = useState<SettingsState>({
     settings: window.api.settingsAPI.getSettings(),
     isSubmitting: false
@@ -22,6 +22,7 @@ const Settings = () => {
     setSettingsState({...settingsState, isSubmitting: true});
 
     // TODO: validation logic here
+    // TODO: better storing of server credentials
 
     window.api.settingsAPI.saveSettings(settingsState.settings);
     

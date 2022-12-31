@@ -20,9 +20,10 @@ import {
 import { LoadingButton } from '@mui/lab'
 import { RaceStatusState, ListState } from 'interfaces/State';
 import { Racer } from 'interfaces/Database';
+import CategoryDetail from './CategoryDetail';
 
-const RaceStatus = () => {
-  const [raceStatusState, setRaceStatus] = useState<RaceStatusState>({
+const RaceStatus = () : JSX.Element => {
+  const [raceInfoState, setRaceInfoState] = useState<RaceStatusState>({
     categoryList: [],
     racerList: []
   });
@@ -34,15 +35,13 @@ const RaceStatus = () => {
 
   const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
 
-  // TODO: rename raceStatusState and listState to better names
-
   // on component mount
   useEffect(() => {
-    let raceStateString = window.localStorage.getItem('raceStatus') as string;
+    let raceInfoStateString = window.localStorage.getItem('raceInfoState') as string;
     let listStateString = window.localStorage.getItem('listState') as string;
  
-    if (!raceStateString) {
-      raceStateString = JSON.stringify({
+    if (!raceInfoStateString) {
+      raceInfoStateString = JSON.stringify({
         categoryList: [],
         racerMap: new Map<string, Racer[]>()
       });
@@ -55,22 +54,22 @@ const RaceStatus = () => {
       });
     }
 
-    let raceState = JSON.parse(raceStateString);
+    let raceInfoState = JSON.parse(raceInfoStateString);
     let listState = JSON.parse(listStateString);
 
     if (listState.raceList.length === 0) {
       getRaces();
     }
 
-    setRaceStatus(raceState);
+    setRaceInfoState(raceInfoState);
     setListState(listState);
     setIsRefreshing(false);
   }, []);
 
   // whenever race state is updated
   useEffect(() => {
-    window.localStorage.setItem('raceStatus', JSON.stringify(raceStatusState));
-  }, [raceStatusState]);
+    window.localStorage.setItem('raceInfoState', JSON.stringify(raceInfoState));
+  }, [raceInfoState]);
 
   useEffect(() => {
     window.localStorage.setItem('listState', JSON.stringify(listState));
@@ -98,9 +97,9 @@ const RaceStatus = () => {
         let newState = {
           categoryList: data[0],
           racerList: data[1] as Racer[]
-        }
+        };
 
-        setRaceStatus(newState);
+        setRaceInfoState(newState);
       })
       .catch((err) => {
         console.error(err);
@@ -123,6 +122,37 @@ const RaceStatus = () => {
 
     if (selectedRace != '') {
       generateCatList(selectedRace);
+    }
+  }
+
+  function getCategoryStatus(categoryId: string) {
+    const baseStyle = {
+      height: '25px',
+      width: '25px',
+      borderRadius: '25%',
+      marginRight: '10px'
+    }
+
+    const racersInCategory = raceInfoState.racerList.filter(racer => racer.categoryId === categoryId);
+
+    if (racersInCategory.length === 0) {
+      return {...baseStyle, backgroundColor: 'rgb(180, 180, 180)'}
+    }  
+
+    let checkedInCount = 0;
+    racersInCategory
+      .forEach(racer => {
+        if (racer.checkedIn) {
+          checkedInCount++;
+        }
+      });
+
+    if (checkedInCount === racersInCategory.length) {
+      return {...baseStyle, backgroundColor: 'rgb(0, 200, 0)'};
+    } else if (checkedInCount == 0 && racersInCategory.length > 0) {
+      return {...baseStyle, backgroundColor: 'rgb(200, 0, 0)'};
+    } else {
+      return {...baseStyle, backgroundColor: 'rgb(220, 220, 0)'};
     }
   }
 
@@ -165,20 +195,22 @@ const RaceStatus = () => {
         </LoadingButton>
       </Box>
       <List>
-        {raceStatusState.categoryList.map(({ id, name }) => (
+        {raceInfoState.categoryList.map(({ id, name }) => (
           <div key={id}>
-            <Accordion disableGutters square>
+            <Accordion 
+              disableGutters 
+              square
+            >
               <AccordionSummary
                 expandIcon={<ExpandMoreSharp />}
               >
-                <Typography>{name}</Typography>
+              <Box
+                style={getCategoryStatus(id)}
+              />
+              <Typography>{name}</Typography>
               </AccordionSummary>
               <AccordionDetails>
-                {raceStatusState.racerList
-                  .filter(racer => racer.categoryId == id)
-                  .map(({ id, name, checkedIn }) => (
-                    <Typography key={id}>Name: {name}, Checked In? {checkedIn.toString()}</Typography>
-                ))}
+                <CategoryDetail raceId={id} racerList={raceInfoState.racerList}></CategoryDetail>
               </AccordionDetails>
             </Accordion>
             <Divider light />
