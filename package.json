@@ -194,8 +194,8 @@
     "webpack-merge": "^5.8.0"
   },
   "build": {
-    "productName": "ElectronReact",
-    "appId": "org.erb.ElectronReact",
+    "productName": "SiTiming Helper & Integration Tool",
+    "appId": "com.evanweiler.sitiming",
     "asar": true,
     "asarUnpack": "**\\*.{node,dll}",
     "files": [
