@@ -54,7 +54,7 @@ const Settings = () : JSX.Element => {
           label='Server IP Address'
           margin='dense'
           value={settingsState.settings.address}
-          onChange={(e) => { 
+          onChange={(e) => {
             setSettingsState({
               ...settingsState,
               settings: { ...settingsState.settings, address: e.target.value }
@@ -69,7 +69,7 @@ const Settings = () : JSX.Element => {
           onChange={(e) => { 
             setSettingsState({
               ...settingsState,
-              settings: { ...settingsState.settings, port: parseInt(e.target.value) }
+              settings: { ...settingsState.settings, port: e.target.value }
             }) 
           }}
         />
