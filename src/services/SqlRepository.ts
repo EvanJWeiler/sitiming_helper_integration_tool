@@ -124,9 +124,13 @@ const getAllCategories = (raceId: string): Promise<Category[]> => {
     connectToServer()
       .then((connection) => {
         const query = `
-          select c.ID as 'id', c.Name as 'name' from Class c
+          select c.ID as 'id', c.Name as 'name', COUNT(e.ID) as 'numRacers'
+          from Class c
+          left join EntryEvent ee on c.ID = ee.ClassID
+          left join Entry E on ee.EntryID = E.ID
           where c.EventID = '${raceId}'
-          order by c.Name asc
+          group by c.Name, c.ID
+          order by c.Name
         `;
 
         return executeQuery(connection, query);

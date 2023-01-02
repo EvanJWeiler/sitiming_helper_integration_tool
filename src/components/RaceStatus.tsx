@@ -15,11 +15,12 @@ import {
   Select, 
   SelectChangeEvent, 
   Typography,
-  Box 
+  Box, 
+  Chip
 } from '@mui/material';
 import { LoadingButton } from '@mui/lab'
 import { RaceStatusState, ListState } from 'interfaces/State';
-import { Racer } from 'interfaces/Database';
+import { Racer, Category } from 'interfaces/Database';
 import CategoryDetail from './CategoryDetail';
 
 const RaceStatus = () : JSX.Element => {
@@ -94,9 +95,17 @@ const RaceStatus = () : JSX.Element => {
 
     Promise.all(promises)
       .then((data) => {
+        let categoryList = (data[0] as Category[]).sort((a, b) => {
+          if (a.numRacers === 0 && b.numRacers === 0) return 0;
+          if (a.numRacers === 0) return 1;
+          if (b.numRacers === 0) return -1;
+
+          return 0;
+        });
+
         let newState = {
-          categoryList: data[0],
-          racerList: data[1] as Racer[]
+          categoryList: categoryList,
+          racerList: data[1] as Racer[],
         };
 
         setRaceInfoState(newState);
@@ -133,29 +142,35 @@ const RaceStatus = () : JSX.Element => {
       marginRight: '10px'
     }
 
-    const racersInCategory = raceInfoState.racerList.filter(racer => racer.categoryId === categoryId);
+    const racersInCat = raceInfoState.racerList.filter(racer => racer.categoryId.includes(categoryId)).length;
+    const racersCheckedIn = raceInfoState.racerList.filter(racer => racer.categoryId.includes(categoryId) && racer.checkedIn).length;
 
-    if (racersInCategory.length === 0) {
-      return {...baseStyle, backgroundColor: 'rgb(180, 180, 180)'}
-    }  
+    if (racersInCat === 0) {
+      return {...baseStyle, backgroundColor: 'rgb(150, 150, 150)'}
+    }
 
-    let checkedInCount = 0;
-    racersInCategory
-      .forEach(racer => {
-        if (racer.checkedIn) {
-          checkedInCount++;
-        }
-      });
-
-    if (checkedInCount === racersInCategory.length) {
+    if (racersCheckedIn === racersInCat) {
       return {...baseStyle, backgroundColor: 'rgb(0, 200, 0)'};
-    } else if (checkedInCount == 0 && racersInCategory.length > 0) {
+    } else if (racersCheckedIn == 0 && racersInCat > 0) {
       return {...baseStyle, backgroundColor: 'rgb(200, 0, 0)'};
     } else {
       return {...baseStyle, backgroundColor: 'rgb(220, 220, 0)'};
     }
   }
 
+  function getCategoryStatusString(categoryId: string) {
+    const racersInCat = raceInfoState.racerList.filter(racer => racer.categoryId.includes(categoryId)).length;
+    const racersCheckedIn = raceInfoState.racerList.filter(racer => racer.categoryId.includes(categoryId) && racer.checkedIn).length;
+
+    if (racersInCat === 0) {
+      return 'N/A';
+    } else {
+      return racersCheckedIn + ' / ' +  racersInCat;
+    }
+  }
+
+  // TODO: emergency contact info getter?
+  // TODO: do not reload page every time route is loaded
   return (
     <div>
       <Box
@@ -194,29 +209,75 @@ const RaceStatus = () : JSX.Element => {
           Refresh
         </LoadingButton>
       </Box>
+      { raceInfoState.categoryList.length != 0 &&
       <List>
+        <Accordion
+          disableGutters 
+          square
+        >
+          <AccordionSummary
+            expandIcon={<ExpandMoreSharp />}
+          >
+            <Box
+              style={getCategoryStatus('')}
+            />
+            <Typography>{listState.raceList.filter(race => race.id === listState.selectedRace).at(0)?.name}</Typography>
+            <Chip
+              variant='outlined'
+              label={getCategoryStatusString('')}
+              style={{
+                height: '25px',
+                marginLeft: '10px'
+              }}
+            />
+          </AccordionSummary>
+          <AccordionDetails>
+            <CategoryDetail 
+              categoryId={''} 
+              racerList={raceInfoState.racerList}
+              categoryList={raceInfoState.categoryList}
+              includeTeam
+              includeCat
+            />
+          </AccordionDetails>
+        </Accordion>
+        <Divider light />
         {raceInfoState.categoryList.map(({ id, name }) => (
           <div key={id}>
             <Accordion 
               disableGutters 
               square
+              disabled={raceInfoState.racerList.filter(racer => racer.categoryId === id).length === 0}
             >
               <AccordionSummary
                 expandIcon={<ExpandMoreSharp />}
               >
-              <Box
-                style={getCategoryStatus(id)}
-              />
-              <Typography>{name}</Typography>
+                <Box
+                  style={getCategoryStatus(id)}
+                />
+                <Typography>{name}</Typography>
+                <Chip
+                  variant='outlined'
+                  label={getCategoryStatusString(id)}
+                  style={{
+                    height: '25px',
+                    marginLeft: '10px'
+                  }}
+                />
               </AccordionSummary>
               <AccordionDetails>
-                <CategoryDetail raceId={id} racerList={raceInfoState.racerList}></CategoryDetail>
+                <CategoryDetail
+                  categoryId={id} 
+                  racerList={raceInfoState.racerList}
+                  includeTeam
+                />
               </AccordionDetails>
             </Accordion>
             <Divider light />
           </div>
         ))}
       </List>
+      }
     </div>
   );
 }

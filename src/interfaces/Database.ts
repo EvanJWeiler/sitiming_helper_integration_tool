@@ -16,4 +16,5 @@ export interface Racer {
 export interface Category {
     id: string;
     name: string;
+    numRacers: number;
 }

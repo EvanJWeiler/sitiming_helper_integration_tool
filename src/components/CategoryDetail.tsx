@@ -1,21 +1,7 @@
 import React from 'react';
-import { Racer } from 'interfaces/Database';
-import { Box } from '@mui/material';
-import { DataGrid, GridColDef, GridRenderCellParams, GridSortCellParams, GridValueGetterParams } from '@mui/x-data-grid';
-
-const columns: GridColDef[] = [
-  { field: 'bibNumber', headerName: 'Bib #', width: 130},
-  { field: 'name', headerName: 'Name', width: 200 },
-  { field: 'teamName', headerName: 'Team Name', width: 300 },
-  { field: 'cardNumber', headerName: 'Si Card #', width: 200 },
-  { 
-    field: 'checkedIn', 
-    headerName: 'Checked In', 
-    width: 175,
-    renderCell: getCheckedInIcon,
-    valueGetter: ((params: GridValueGetterParams) => { return params.row.checkedIn })
-  },
-];
+import { Category, Racer } from 'interfaces/Database';
+import { Box, Button, Modal } from '@mui/material';
+import { DataGrid, GridColDef, GridRenderCellParams, GridValueGetterParams } from '@mui/x-data-grid';
 
 function getCheckedInIcon(params: GridRenderCellParams) {
   const baseStyle = {
@@ -30,16 +16,39 @@ function getCheckedInIcon(params: GridRenderCellParams) {
   }
 }
 
-interface CatDetailProps {
-    raceId: string;
-    racerList: Racer[];
+interface CategoryDetailProps {
+  categoryId: string;
+  racerList: Racer[];
+  includeCat?: boolean;
+  includeTeam?: boolean;
+  categoryList?: Category[];
 }
 
-const CategoryDetail = ({ raceId, racerList }: CatDetailProps) : JSX.Element => {
+const CategoryDetail = ({categoryId, racerList, includeCat = false, includeTeam = false, categoryList = []} : CategoryDetailProps) : JSX.Element => {
+  const columns: GridColDef[] = [
+    { field: 'bibNumber', headerName: 'Bib #', width: 110, hideable: false},
+    { field: 'name', headerName: 'Name', width: 200, hideable: false },
+    { field: 'cardNumber', headerName: 'Si Card #', width: 125, hideable: false },
+    { field: 'teamName', headerName: 'Team Name', width: 300, hideable: false },
+    { 
+      field: 'checkedIn', 
+      headerName: 'Checked In', 
+      width: 150,
+      hideable: false,
+      renderCell: getCheckedInIcon,
+      valueGetter: ((params: GridValueGetterParams) => { return params.row.checkedIn })
+    },
+    { 
+      field: 'categoryName', headerName: 'Category', width: 300, hideable: false,
+      valueGetter: ((params: GridValueGetterParams) => { 
+        return categoryList.filter(category => category.id.includes(params.row.categoryId)).at(0)?.name
+      })
+    }
+  ];
+
   return (
     <div
       style={{
-        // height: 460,
         width: '100%'
       }}
     >
@@ -48,10 +57,14 @@ const CategoryDetail = ({ raceId, racerList }: CatDetailProps) : JSX.Element => 
           density='compact'
           disableSelectionOnClick
           autoHeight
-          rows={racerList.filter(racer => racer.categoryId == raceId)}
+          rows={racerList.filter(racer => racer.categoryId.includes(categoryId))}
           columns={columns}
           pageSize={15}
           rowsPerPageOptions={[15]}
+          columnVisibilityModel={{
+            teamName: includeTeam,
+            categoryName: includeCat
+          }}
         />
       }
     </div>
