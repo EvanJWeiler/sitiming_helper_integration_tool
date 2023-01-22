@@ -10,15 +10,13 @@ import { createTheme, ThemeProvider } from '@mui/material';
 const theme = createTheme({
   palette: {
     primary: {
-      main: '#606060'
-    }
+      main: '#606060',
+    },
   },
   typography: {
-    fontFamily: [
-      '"Segoe UI"'
-    ].join(',')
-  }
-})
+    fontFamily: ['"Segoe UI"'].join(','),
+  },
+});
 
 export default function App() {
   return (
@@ -28,7 +26,7 @@ export default function App() {
           <Sidebar />
           <div id="content">
             <Routes>
-              <Route path="/racestatus" element={<RaceStatus />} />
+              <Route path="/" element={<RaceStatus />} />
               <Route path="/racedata" element={<RaceData />} />
               <Route path="/settings" element={<Settings />} />
             </Routes>

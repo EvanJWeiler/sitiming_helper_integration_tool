@@ -13,7 +13,7 @@ const SidebarData = [
   {
     key: 1,
     label: 'Race Status',
-    path: '/racestatus',
+    path: '/',
     icon: <DirectionsBikeIcon />,
   },
   {
@@ -37,15 +37,15 @@ const linkStyle = {
   color: 'whitesmoke',
   justifyContent: 'center',
   alignItems: 'center',
-  textDecoration: 'none'
+  textDecoration: 'none',
 };
 
 const linkStyleActive = {
   ...linkStyle,
-  backgroundColor: 'rgb(40,40,40)'
+  backgroundColor: 'rgb(40,40,40)',
 };
 
-const Sidebar = () : JSX.Element => {
+const Sidebar = (): JSX.Element => {
   return (
     <div
       style={{
@@ -60,7 +60,7 @@ const Sidebar = () : JSX.Element => {
         alt="Sport Ident Logo"
         style={{
           width: '90%',
-          margin: '10px'
+          margin: '10px',
         }}
       />
       <List disablePadding>
@@ -68,22 +68,20 @@ const Sidebar = () : JSX.Element => {
           <NavLink
             key={key}
             to={path}
-            style={({ isActive }) => 
-              isActive ? linkStyleActive : linkStyle
-            }  
+            style={({ isActive }) => (isActive ? linkStyleActive : linkStyle)}
           >
             <ListItemButton>
               <div
                 style={{
                   paddingRight: '10px',
-                  marginBottom: '-7px'
+                  marginBottom: '-7px',
                 }}
               >
                 {icon}
               </div>
               <ListItemText
                 primaryTypographyProps={{
-                  fontSize: '1.2em'
+                  fontSize: '1.2em',
                 }}
               >
                 {label}
@@ -94,6 +92,6 @@ const Sidebar = () : JSX.Element => {
       </List>
     </div>
   );
-}
+};
 
 export default Sidebar;

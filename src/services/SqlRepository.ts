@@ -1,7 +1,7 @@
-const { Connection, Request: Req } = require('tedious');
+import { Race, Racer, Category } from 'interfaces/Database';
+import SettingsAPI from './SettingsRepository';
 
-import { Race, Racer, Category } from "interfaces/Database";
-import SettingsAPI from "./SettingsRepository";
+const { Connection, Request: Req } = require('tedious');
 
 const getConfig = () => {
   const serverSettings = SettingsAPI.getSettings();
@@ -12,18 +12,18 @@ const getConfig = () => {
       type: 'default',
       options: {
         userName: serverSettings.username,
-        password: serverSettings.password
-      }
+        password: serverSettings.password,
+      },
     },
     options: {
       database: serverSettings.database,
       port: serverSettings.port,
       encrypt: false,
       trustServerCertificate: false,
-      rowCollectionOnDone: true
-    }
-  }
-}
+      rowCollectionOnDone: true,
+    },
+  };
+};
 
 const connectToServer = (): Promise<typeof Connection> => {
   return new Promise((resolve, reject) => {
@@ -164,7 +164,7 @@ const SqlAPI = {
   getRacersByCategory,
   getRacersByRaceId,
   getAllCategories,
-  getAllRaces
+  getAllRaces,
 };
 
 export default SqlAPI;
